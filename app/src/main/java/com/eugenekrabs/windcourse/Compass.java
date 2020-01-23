@@ -1,4 +1,4 @@
-package com.sevencrayons.compass;
+package com.eugenekrabs.windcourse;
 
 import android.content.Context;
 import android.hardware.Sensor;
@@ -25,7 +25,6 @@ public class Compass implements SensorEventListener {
     private float[] I = new float[9];
 
     private float azimuth;
-    private float azimuthFix;
 
     public Compass(Context context) {
         sensorManager = (SensorManager) context
@@ -43,14 +42,6 @@ public class Compass implements SensorEventListener {
 
     public void stop() {
         sensorManager.unregisterListener(this);
-    }
-
-    public void setAzimuthFix(float fix) {
-        azimuthFix = fix;
-    }
-
-    public void resetAzimuthFix() {
-        setAzimuthFix(0);
     }
 
     public void setListener(CompassListener l) {
@@ -71,9 +62,6 @@ public class Compass implements SensorEventListener {
                 mGravity[2] = alpha * mGravity[2] + (1 - alpha)
                         * event.values[2];
 
-                // mGravity = event.values;
-
-                // Log.e(TAG, Float.toString(mGravity[0]));
             }
 
             if (event.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD) {
@@ -96,7 +84,7 @@ public class Compass implements SensorEventListener {
                 SensorManager.getOrientation(R, orientation);
                 // Log.d(TAG, "azimuth (rad): " + azimuth);
                 azimuth = (float) Math.toDegrees(orientation[0]); // orientation
-                azimuth = (azimuth + azimuthFix + 360) % 360;
+                azimuth = (azimuth + 360) % 360;
                 // Log.d(TAG, "azimuth (deg): " + azimuth);
                 if (listener != null) {
                     listener.onNewAzimuth(azimuth);

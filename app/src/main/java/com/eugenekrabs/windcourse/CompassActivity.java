@@ -1,13 +1,9 @@
-package com.sevencrayons.compass;
+package com.eugenekrabs.windcourse;
 
-import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.animation.Animation;
-import android.view.animation.RotateAnimation;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.widget.LinearLayout;
 
 
 public class CompassActivity extends AppCompatActivity {
@@ -15,21 +11,19 @@ public class CompassActivity extends AppCompatActivity {
     private static final String TAG = "CompassActivity";
 
     private Compass compass;
-    private ImageView arrowView;
-    private TextView sotwLabel;  // SOTW is for "side of the world"
 
-    private float currentAzimuth;
-    private SOTWFormatter sotwFormatter;
+    private String currentImage;
+    private float diff = 0.0f;
+    private boolean isDiffDefined;
+    private AzimutToImageConverter converter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_compass);
 
-        sotwFormatter = new SOTWFormatter(this);
+        converter = new AzimutToImageConverter();
 
-        arrowView = findViewById(R.id.main_image_hands);
-        sotwLabel = findViewById(R.id.sotw_label);
         setupCompass();
     }
 
@@ -66,23 +60,28 @@ public class CompassActivity extends AppCompatActivity {
     }
 
     private void adjustArrow(float azimuth) {
-        Log.d(TAG, "will set rotation from " + currentAzimuth + " to "
-                + azimuth);
+//        Log.d(TAG, azimuth + "");
 
-        Animation an = new RotateAnimation(-currentAzimuth, -azimuth,
-                Animation.RELATIVE_TO_SELF, 0.5f, Animation.RELATIVE_TO_SELF,
-                0.5f);
-        currentAzimuth = azimuth;
+        if (diff == 0.0f) {
+            diff = azimuth;
+        }
+        String imageName = converter.format(azimuth, diff);
 
-        an.setDuration(500);
-        an.setRepeatCount(0);
-        an.setFillAfter(true);
 
-        arrowView.startAnimation(an);
-    }
+        if (imageName.equals(currentImage)) {
+            return;
+        }
 
-    private void adjustSotwLabel(float azimuth) {
-        sotwLabel.setText(sotwFormatter.format(azimuth));
+        int resID = getResources().getIdentifier(imageName,
+                "drawable", getPackageName());
+
+        if (resID == 0) {
+            return;
+        }
+
+        LinearLayout root=(LinearLayout)findViewById(R.id.root);
+        root.setBackgroundResource(resID);
+        currentImage = imageName;
     }
 
     private Compass.CompassListener getCompassListener() {
@@ -95,7 +94,6 @@ public class CompassActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         adjustArrow(azimuth);
-                        adjustSotwLabel(azimuth);
                     }
                 });
             }
