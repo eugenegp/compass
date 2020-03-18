@@ -4,7 +4,7 @@ It was created just as a code snippet reuse in some of my projects.
 The main feature of the compass is noise filter (Low-pass filter) which make the arrow
 more stable in comparison to other similar applications where arrow always trembles.
 
-You can install it from google play: https://play.google.com/store/apps/details?id=com.sevencrayons.compass
+You can install it from google play: https://play.google.com/store/apps/details?id=com.eugenekrabs.windcourse
 
 Enhancements are welcome!
 
